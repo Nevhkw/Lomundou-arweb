@@ -6,16 +6,16 @@ const THREE = window.MINDAR.IMAGE.THREE;
 // Function to initialize the MindARThree instance
 const initializeMindAR = () => {
   return new window.MINDAR.IMAGE.MindARThree({
-    container: document.body, // Attach AR experience to the body
+    container: document.querySelector("#ar-container"), // Point to the new div
     imageTargetSrc: './assets/targets/Lomundou.mind',
   });
 };
 
-// Configure GLTFLoader with DRACOLoader
+// 2. Update the Draco path (remove '/storybook/' as you are now in the root)
 const configureGLTFLoader = () => {
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
-  dracoLoader.setDecoderPath('/storybook/libs/draco/'); // Path to DRACO decoder files
+  dracoLoader.setDecoderPath('./libs/draco/'); // Fixed relative path
   loader.setDRACOLoader(dracoLoader);
   return loader;
 };
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const start = async () => {
     const mindarThree = initializeMindAR();
     const { renderer, scene, camera } = mindarThree;
-
+	
     renderer.clock = new THREE.Clock(); // Create a clock for animations
     setupLighting(scene); // Add lighting
 
@@ -293,6 +293,15 @@ const page1Mixer = await setupAnchorWithAutoAnimationAndAudio(mindarThree, page1
      const page9Mixer = await setupAnchorWithAutoAnimationAndAudio(mindarThree, page9Model, 8,  './assets/audio/english/page9.mp3');
 
      const page10Mixer = await setupAnchorWithAutoAnimationAndAudio(mindarThree, page10Model, 9,  './assets/audio/english/page10.mp3');
+	 
+	 const startButton = document.querySelector("#startButton");
+    startButton.addEventListener("click", async () => {
+      startButton.style.display = "none"; // Hide button after click
+      
+      try {
+        await mindarThree.start(); // This triggers the camera permission prompt
+        renderer.setAnimationLoop(() => {
+          const delta = renderer.clock.getDelta();
 
 
  // Enable interaction for each model
@@ -340,9 +349,12 @@ const page1Mixer = await setupAnchorWithAutoAnimationAndAudio(mindarThree, page1
         page8Mixer.update(delta);
         page9Mixer.update(delta);
         page10Mixer.update(delta);
-      },
+     renderer.render(scene, camera);
+        });
+      } catch (err) {
+        console.error("Camera failed:", err);
+      }
     });
   };
-
   start();
 });

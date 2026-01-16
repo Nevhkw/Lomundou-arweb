@@ -6,16 +6,16 @@ const THREE = window.MINDAR.IMAGE.THREE;
 // Function to initialize the MindARThree instance
 const initializeMindAR = () => {
   return new window.MINDAR.IMAGE.MindARThree({
-    container: document.body, // Attach AR experience to the body
+    container: document.querySelector("#ar-container"), // Point to the new div
     imageTargetSrc: './assets/targets/Lomundou.mind',
   });
 };
 
-// Configure GLTFLoader with DRACOLoader
+// 2. Update the Draco path (remove '/storybook/' as you are now in the root)
 const configureGLTFLoader = () => {
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
-  dracoLoader.setDecoderPath('/storybook/libs/draco/'); // Path to DRACO decoder files
+  dracoLoader.setDecoderPath('./libs/draco/'); // Fixed relative path
   loader.setDRACOLoader(dracoLoader);
   return loader;
 };
@@ -219,60 +219,58 @@ const startRenderingLoop = (renderer, scene, camera, options) => {
 
 document.addEventListener('DOMContentLoaded', () => {
   const start = async () => {
-    // Change container to point to your new #container div
-    const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-      container: document.querySelector("#container"), 
-      imageTargetSrc: './assets/targets/Lomundou.mind',
-    });
+    const mindarThree = initializeMindAR();
+    const { renderer, scene, camera } = mindarThree;
+	
     renderer.clock = new THREE.Clock(); // Create a clock for animations
     setupLighting(scene); // Add lighting
 
     // Load models and set up anchors
     const page1Model = await loadModel(
   './assets/models/scene1.glb', 
-  { x: 0.12, y: 0.12, z: 0.12 }, // Scale for page1
+  { x: 0.04, y: 0.04, z: 0.04 }, // Scale for page1
   { x: 0, y: -0.4, z: 0 }        // Position for page1
 );
     const page2Model = await loadModel('./assets/models/scene2.glb', 
-  { x: 0.16, y: 0.16, z: 0.16 }, // Scale for page2
+  { x: 0.08, y: 0.08, z: 0.08 }, // Scale for page2
   { x: 0, y: -0.4, z: 0 }        // Position for page2
 );
     const page3Model = await loadModel('./assets/models/scene3.glb', 
-  { x: 0.16, y: 0.16, z: 0.16 }, // Scale for page3
+  { x: 0.08, y: 0.08, z: 0.08 }, // Scale for page3
   { x: 0, y: -0.4, z: 0 }        // Position for page3
 );
     const page4Model = await loadModel('./assets/models/scene4.glb', 
-  { x: 0.12, y: 0.12, z: 0.12 }, // Scale for page4
+  { x: 0.04, y: 0.04, z: 0.04 }, // Scale for page4
   { x: -0.1, y: -0.4, z: -1.0 }        // Position for page4
 );
 
 const page5Model = await loadModel('./assets/models/scene5.glb', 
-  { x: 0.12, y: 0.12, z: 0.12 }, // Scale for page5
+  { x: 0.04, y: 0.04, z: 0.04 }, // Scale for page5
   { x: 0, y: -0.4, z: 0 }        // Position for page5
 );
 
 const page6Model = await loadModel('./assets/models/scene6.glb', 
-  { x: 0.18, y: 0.18, z: 0.18 }, // Scale for page6
+  { x: 0.06, y: 0.06, z: 0.06 }, // Scale for page6
   { x: 0, y: -1.0, z: 0 }        // Position for page6
 );
 
 const page7Model = await loadModel('./assets/models/scene7.glb', 
-  { x: 0.06, y: 0.06, z: 0.06 }, // Scale for page7
+  { x: 0.02, y: 0.02, z: 0.02 }, // Scale for page7
   { x: 0, y: -0.6, z: 0 }        // Position for page7
 );
 
 const page8Model = await loadModel('./assets/models/scene8.glb', 
-  { x: 0.06, y: 0.06, z: 0.06 }, // Scale for page8
+  { x: 0.02, y: 0.02, z: 0.02 }, // Scale for page8
   { x: 0, y: -0.5, z: 0 }        // Position for page8
 );
 
 const page9Model = await loadModel('./assets/models/scene9.glb', 
-  { x: 0.06, y: 0.06, z: 0.06 }, // Scale for page9
+  { x: 0.02, y: 0.02, z: 0.02 }, // Scale for page9
   { x: 0, y: -0.3, z: 0 }        // Position for page9
 );
 
 const page10Model = await loadModel('./assets/models/scene10.glb', 
-  { x: 0.18, y: 0.18, z: 0.18 }, // Scale for page10
+  { x: 0.06, y: 0.06, z: 0.06 }, // Scale for page10
   { x: 0, y: -0.4, z: 0 }        // Position for page10
 );
 
@@ -295,6 +293,15 @@ const page1Mixer = await setupAnchorWithAutoAnimationAndAudio(mindarThree, page1
      const page9Mixer = await setupAnchorWithAutoAnimationAndAudio(mindarThree, page9Model, 8,  './assets/audio/malay/page9.mp3');
 
      const page10Mixer = await setupAnchorWithAutoAnimationAndAudio(mindarThree, page10Model, 9,  './assets/audio/malay/page10.mp3');
+	 
+	 const startButton = document.querySelector("#startButton");
+    startButton.addEventListener("click", async () => {
+      startButton.style.display = "none"; // Hide button after click
+      
+      try {
+        await mindarThree.start(); // This triggers the camera permission prompt
+        renderer.setAnimationLoop(() => {
+          const delta = renderer.clock.getDelta();
 
 
  // Enable interaction for each model
@@ -342,10 +349,12 @@ const page1Mixer = await setupAnchorWithAutoAnimationAndAudio(mindarThree, page1
         page8Mixer.update(delta);
         page9Mixer.update(delta);
         page10Mixer.update(delta);
-      },
+     renderer.render(scene, camera);
+        });
+      } catch (err) {
+        console.error("Camera failed:", err);
+      }
     });
   };
-
   start();
 });
-
