@@ -5,8 +5,9 @@ const THREE = window.MINDAR.IMAGE.THREE;
 
 // Function to initialize the MindARThree instance
 const initializeMindAR = () => {
+  const container = document.querySelector("#ar-container"); // FIX: Target the specific div
   return new window.MINDAR.IMAGE.MindARThree({
-    container: document.querySelector("#ar-container"), // Point to the new div
+    container: container,
     imageTargetSrc: './assets/targets/Lomundou.mind',
   });
 };
@@ -296,12 +297,20 @@ const page1Mixer = await setupAnchorWithAutoAnimationAndAudio(mindarThree, page1
 	 
 	 const startButton = document.querySelector("#startButton");
     startButton.addEventListener("click", async () => {
-      startButton.style.display = "none"; // Hide button after click
+      startButton.style.display = "none";
       
       try {
-        await mindarThree.start(); // This triggers the camera permission prompt
+        // This is the specific line that triggers the camera popup
+        await mindarThree.start(); 
+        
         renderer.setAnimationLoop(() => {
           const delta = renderer.clock.getDelta();
+          // Make sure all your mixers (page1Mixer, etc.) are updated here
+          renderer.render(scene, camera);
+        });
+      } catch (err) {
+        console.error("Camera error:", err);
+        alert("Camera could not start. Please ensure you have granted permission in browser settings.");
 
 
  // Enable interaction for each model
