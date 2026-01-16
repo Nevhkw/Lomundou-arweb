@@ -3,64 +3,98 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pilih Bahasa Audio | Lumondou</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <title>Pilih Bahasa Audio | Start AR</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-      /* Force center alignment for this specific page */
-      body {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-      }
-  </style>
 </head>
 
-<body>
-  <div id="particles"></div>
+<body class="langBody">
 
-  <div class="lang-container">
-    <h1 style="color: var(--gold); margin-bottom: 10px;">Tetapan Bahasa</h1>
-    <p style="color: #f4e4bc; font-style: italic; margin-bottom: 30px;">
-        Sila pilih bahasa audio untuk mendengar kisah <b>Lagenda Lumondou</b> dalam mod AR.
-    </p>
+  <!-- NAVBAR -->
+  <header class="nav">
+    <div class="wrap nav__inner">
+      <a class="brand" href="index.html">
+        <span class="brand__icon">📖</span>
+        <span class="brand__text">Lagenda Aki Nabalu&nbsp;</span>
+      </a>
 
-    <div class="lang-options">
-      <button class="lang-btn" onclick="startAR('bm')">
-        Bahasa Melayu
-      </button>
-
-      <button class="lang-btn" onclick="startAR('en')">
-        English
-      </button>
-
-      <button class="lang-btn" onclick="startAR('ds')">
-        Bahasa Dusun
-      </button>
-      
-      <br>
-      <a href="index.html" style="color:white; margin-top:15px; text-decoration:underline;">← Kembali ke Laman Utama</a>
+      <a class="pillBtn" href="index.html">← Kembali</a>
     </div>
-  </div>
+  </header>
 
-  <script src="ui.js"></script>
+  <!-- LANGUAGE SELECTION -->
+  <main class="langPage">
+    <div class="wrap">
+      <h1 class="pageTitle">Tetapan Bahasa</h1>
+      <p class="pageSub">
+        Sila pilih bahasa audio untuk mendengar kisah <b>Lagenda Aki Nabalu</b> dalam mod AR.
+      </p>
+
+      <div class="langList">
+
+        <!-- Bahasa Melayu -->
+        <button class="langItem" onclick="startAR('bm')">
+          <div class="langBadge bm">BM</div>
+          <div class="langText">
+            <div class="langName">Bahasa Melayu</div>
+            <div class="langSub">MALAY</div>
+          </div>
+          <div class="playIcon">▶</div>
+        </button>
+
+        <!-- English -->
+        <button class="langItem" onclick="startAR('en')">
+          <div class="langBadge en">EN</div>
+          <div class="langText">
+            <div class="langName">English</div>
+            <div class="langSub">ENGLISH</div>
+          </div>
+          <div class="playIcon">▶</div>
+        </button>
+
+        <!-- Dusun -->
+        <button class="langItem" onclick="startAR('ds')">
+          <div class="langBadge ds">DS</div>
+          <div class="langText">
+            <div class="langName">Bahasa Dusun</div>
+            <div class="langSub">DUSUN</div>
+          </div>
+          <div class="playIcon">▶</div>
+        </button>
+
+      </div>
+
+    
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer footer--night">
+    <div class="wrap footer__inner">
+      <p>© 2026 Penerbit UMS. Hak Cipta Terpelihara.</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT: MAP LANGUAGE → AR PAGE -->
   <script>
     function startAR(langCode){
-      // Map language to AR pages
+
+      // Optional: store selected language (future-proof)
+      localStorage.setItem("storybook_audio_lang", langCode);
+
+      // Map language to EXISTING AR pages
       const AR_PAGES = {
-        bm: "scanBM.html",   // Maps to Malay AR
-        en: "scanEng.html",  // Maps to English AR
-        ds: "scanDusun.html" // Maps to Dusun AR
+        en: "scanEng.html",    // English AR
+        bm: "scanBM.html",  // Bahasa Melayu AR
+        ds: "scanDusun.html"  // Dusun AR 
       };
 
       const targetPage = AR_PAGES[langCode];
 
       if(targetPage){
+        // Open AR in same tab (recommended for mobile)
         window.location.href = targetPage;
       } else {
-        alert("Halaman AR tidak dijumpai.");
+        alert("Halaman AR tidak dijumpai untuk bahasa ini.");
       }
     }
   </script>
