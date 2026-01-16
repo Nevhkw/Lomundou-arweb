@@ -3,6 +3,7 @@ import { GLTFLoader } from "./libs/three.js-r132/examples/jsm/loaders/GLTFLoader
 
 const THREE = window.MINDAR.IMAGE.THREE;
 
+// 1. Initialize MindAR with the correct container ID
 const initializeMindAR = () => {
   const container = document.querySelector("#ar-container"); 
   return new window.MINDAR.IMAGE.MindARThree({
@@ -11,9 +12,11 @@ const initializeMindAR = () => {
   });
 };
 
+// 2. Configure GLTFLoader with the correct relative path for Draco
 const configureGLTFLoader = () => {
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
+  // Using './' ensures it works in the root directory
   dracoLoader.setDecoderPath('./libs/draco/'); 
   loader.setDRACOLoader(dracoLoader);
   return loader;
@@ -135,6 +138,7 @@ const enablePlayOnInteraction = (renderer, scene, camera, model, mixer) => {
   window.addEventListener("touchstart", handleInteraction);
 };
 
+// 3. Main Start Function with User Gesture Trigger
 document.addEventListener('DOMContentLoaded', () => {
   const start = async () => {
     const mindarThree = initializeMindAR();
@@ -142,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderer.clock = new THREE.Clock();
     setupLighting(scene);
 
+    // Load all models
     const m1 = await loadModel('./assets/models/scene1.glb', { x: 0.04, y: 0.04, z: 0.04 });
     const m2 = await loadModel('./assets/models/scene2.glb', { x: 0.08, y: 0.08, z: 0.08 });
     const m3 = await loadModel('./assets/models/scene3.glb', { x: 0.08, y: 0.08, z: 0.08 });
@@ -153,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const m9 = await loadModel('./assets/models/scene9.glb', { x: 0.02, y: 0.02, z: 0.02 }, { x: 0, y: -0.3, z: 0 });
     const m10 = await loadModel('./assets/models/scene10.glb', { x: 0.06, y: 0.06, z: 0.06 });
 
+    // Set up all anchors
     const mix1 = await setupAnchorWithAutoAnimationAndAudio(mindarThree, m1, 0, './assets/audio/english/page1.mp3');
     const mix2 = await setupAnchorWithAutoAnimationAndAudio(mindarThree, m2, 1, './assets/audio/english/page2.mp3');
     const mix3 = await setupAnchorWithAutoAnimationAndAudio(mindarThree, m3, 2, './assets/audio/english/page3.mp3');
@@ -173,18 +179,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const startButton = document.querySelector("#startButton");
+    
+    // THE CAMERA TRIGGER: Wait for user click
     startButton.addEventListener("click", async () => {
       startButton.style.display = "none";
       try {
-        await mindarThree.start();
+        await mindarThree.start(); // Triggers the permission prompt
         renderer.setAnimationLoop(() => {
           const delta = renderer.clock.getDelta();
-          mixers.forEach(mix => mix.update(delta));
+          mixers.forEach(mix => mix.update(delta)); // Update all animations
           renderer.render(scene, camera);
         });
       } catch (err) {
         console.error("Camera failed:", err);
-        alert("Could not start camera. Check your browser permissions.");
+        alert("Camera access denied. Please allow camera in settings.");
       }
     });
   };
